@@ -7,7 +7,6 @@ namespace Post.Server.Entities
 {
     public class ServerMessage : Message
     {
-        public string Address { get; set; }
-        public DateTime ReceiveTime { get; set; }
+        public string Address { get; set; }        
     }
 }
