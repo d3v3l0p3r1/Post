@@ -8,7 +8,7 @@ using Post.Server.Services.Abstract;
 
 namespace Post.Server.Web.Controllers
 {
-    [Route("/")]
+    [Route("api/[controller]")]
     [ApiController]
     public class MessagesController : ControllerBase
     {
@@ -29,7 +29,9 @@ namespace Post.Server.Web.Controllers
         {
             try
             {
-                await _messageService.CreateMessage(message, "");
+                var ip = HttpContext.Connection.RemoteIpAddress.ToString();
+
+                await _messageService.CreateMessage(message, ip);
 
                 return Ok();
             }
@@ -46,7 +48,7 @@ namespace Post.Server.Web.Controllers
         /// <param name="take">items on page</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("/list")]
+        [Route("list")]
         public IActionResult Get(int page = 0, int take = 10)
         {
             var list = _messageService.Get(page, take);

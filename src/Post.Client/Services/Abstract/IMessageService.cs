@@ -8,5 +8,7 @@ namespace Post.Client.Services.Abstract
     public interface IMessageService
     {
         Task CreateMessage(string message);
+
+        Task<int> ProccessInvalidMessages();
     }
 }

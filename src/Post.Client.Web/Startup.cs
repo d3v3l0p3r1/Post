@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -40,6 +42,11 @@ namespace Post.Client.Web
                 options.UseNpgsql(connectionString, c => c.MigrationsAssembly("Post.Client"));
             });
 
+            services.AddHangfire(config =>
+            {
+                config.UsePostgreSqlStorage(Configuration.GetConnectionString(nameof(ClientContext)));
+            });
+
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new Swashbuckle.AspNetCore.Swagger.Info()
@@ -71,12 +78,17 @@ namespace Post.Client.Web
                 config.RoutePrefix = string.Empty;
             });
 
+            app.UseHangfireServer();
+            app.UseHangfireDashboard();
+
             InitializeDatabase(app);
+                        
+            RecurringJob.AddOrUpdate<IMessageService>(x => x.ProccessInvalidMessages(), Cron.Minutely);
         }
 
         private void InitializeDatabase(IApplicationBuilder app)
         {
-            using(var scope = app.ApplicationServices.CreateScope())
+            using (var scope = app.ApplicationServices.CreateScope())
             {
                 var context = scope.ServiceProvider.GetService<ClientContext>();
                 context.Database.Migrate();

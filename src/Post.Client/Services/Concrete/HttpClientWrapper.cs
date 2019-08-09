@@ -25,7 +25,7 @@ namespace Post.Client.Services.Concrete
         {
             var content = new StringContent(message);
 
-            var response = await _httpClient.PostAsync("", content);
+            var response = await _httpClient.PostAsync("api/messages", content);
 
             return response.IsSuccessStatusCode;
         }
